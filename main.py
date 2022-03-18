@@ -2,7 +2,7 @@ import secrets
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -66,8 +66,9 @@ templates = Jinja2Templates(directory="templates")
 # Render Landing page
 @app.get('/')
 @limiter.limit("10/minute")
-def homepage(request: Request):
-    return templates.TemplateResponse('index.html', {"request":request})
+def homepage(request: Request, username: bool = Depends(get_current_username)):
+    if username:
+        return templates.TemplateResponse('index.html', {"request":request})
 
 
 # Route for maunal CID search
@@ -83,8 +84,9 @@ async def form_post(request: Request, _hash: str = Form(...)):
 # Route for ipfs-url in tweets
 @app.get("/ipfs/{_hash}")
 @limiter.limit("10/minute")
-async def get(request: Request, _hash: str):
-    result = Ipfs(_hash).search()
-    if isinstance(result, bytes):
-        result = result.decode("utf-8")
-    return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
+async def get(request: Request, _hash: str, username: bool = Depends(get_current_username)):
+    if username:
+        result = Ipfs(_hash).search()
+        if isinstance(result, bytes):
+            result = result.decode("utf-8")
+        return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
