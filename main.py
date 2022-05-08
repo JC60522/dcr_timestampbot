@@ -64,15 +64,14 @@ templates = Jinja2Templates(directory="templates")
 
 # Render Landing page
 @app.get('/')
-@limiter.limit("5/minute")
-def homepage(request: Request, username: bool = Depends(get_current_username)):
-    if username:
-        return templates.TemplateResponse('index.html', {"request": request})
+@limiter.limit("3/minute")
+def homepage(request: Request, username):
+    return templates.TemplateResponse('index.html', {"request": request})
 
 
 # Route for maunal CID search
 @app.post("/")
-@limiter.limit("5/minute")
+@limiter.limit("3/minute")
 async def form_post(request: Request, _hash: str = Form(...)):
     if re.match(r'^[Qm][1-9A-Za-z]{44}[^OIl]$', _hash) is None:
         return templates.TemplateResponse('result.html',
@@ -91,7 +90,7 @@ async def form_post(request: Request, _hash: str = Form(...)):
 
 # Route for ipfs-url in tweets
 @app.get("/ipfs/{_hash}")
-@limiter.limit("5/minute")
+@limiter.limit("3/minute")
 async def get(request: Request, _hash: str):
     if re.match(r'^[Qm][1-9A-Za-z]{44}[^OIl]$', _hash) is None:
         return templates.TemplateResponse('result.html',
