@@ -79,6 +79,10 @@ async def form_post(request: Request, _hash: str = Form(...)):
                                           <br><a href="https://dcr-timestampbot.com"><b style="color: red; ">
                                           Back to Home<b></a>''')})
     result = Ipfs(_hash).search()
+    if not result:
+        return templates.TemplateResponse('result.html', context={'request': request, 'result': Markup(f'''<b>CID Not Found</b>
+                                          <br><a href="https://dcr-timestampbot.com"><b style="color: red; ">
+                                          Back to Home<b></a>''')})
     if isinstance(result, bytes):
         result = result.decode("utf-8")
         result = Markup(f'<hr size="8"><br><b>{result}</b><br>'
