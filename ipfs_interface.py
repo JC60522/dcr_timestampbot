@@ -1,27 +1,33 @@
-import json
 import ipfshttpclient
 
 
 class Ipfs:
-    '''
-    2 functions for search(from) / add(to) ipfs node/daemon
-    '''
     def __init__(self, query):
         self.query = query
 
     def search(self):
+        """
+        Method searches for content from IPFS node.
+        :return: Returns search result.
+        """
         try:
             client = ipfshttpclient.connect(timeout=5)
-            return client.cat(self.query)
+            res = client.cat(self.query)
+            return res
         except Exception as e:
             print(e)
-            return "Oops...Some error occured while quering your document Hash."
+            return False
 
     def add(self):
+        """
+        Method adds content to IPFS node.
+        :return: Returns CIDv0.
+        """
         try:
             client = ipfshttpclient.connect(timeout=5)
-            return client.add_json(self.query)
+            res = client.add_json(self.query)
+            return res
         except Exception as e:
             print(e)
-            return "Oops...Some error occured while quering your document Hash."
+            return False
 
