@@ -61,7 +61,7 @@ def listen():
 
                 # Construct tweet body
                 ipfs_url = f'https://dcr-timestampbot.com/ipfs/{cid}'
-                reply = f'Hey There {template["user"]["name"]} :) This thread is stored on IPFS and will be timestamped within the next hour. Times-tamping status: {dcrtime_url} ~ IPFS Thread: {ipfs_url}'
+                reply = f'Hey There @{template["user"]["screen_name"]} :) This thread is stored on IPFS and will be timestamped within the next hour. Times-tamping status: {dcrtime_url} ~ IPFS Thread: {ipfs_url}'
                 try:
                     # Tweet reply to mention with ipfs and dcr-time urls, and save ID to csv (last mentioned)
                     api.update_status(status=reply, in_reply_to_status_id=template["id_str"])
