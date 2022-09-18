@@ -99,9 +99,8 @@ async def get(request: Request, _hash: str):
                                           context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">Invalid query format. Make sure it starts with "Qm" and is 46 characters long.</pre>'
                                           f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
     result = Ipfs(_hash).search()
-    if True:
-        # result = result.decode("utf-8")
-        result = """{"created_at":"Thu Jun 02 13:19:22 +0000 2022","id_str":"1532351168101470210","repliedid":1503038999778271238,"text":"@test2332_te pls stamp this","user":{"id_str":"1141064886077837313","name":"trt5trs","screen_name":"trt5trs"}}"""
+    if isinstance(result, bytes):
+        result = result.decode("utf-8")
         result = Markup(f'<pre class="result__thread result__thread--success">{result}</pre>'
                         f'<div class="result__twitter"><a target="__blank" href="https://twitter.com/{json.loads(result)["user"]["screen_name"]}/status/'
                         f'{json.loads(result)["id_str"]}">'
