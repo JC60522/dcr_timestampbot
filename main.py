@@ -1,4 +1,5 @@
 import json, secrets, re
+import uvicorn
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.openapi.utils import get_openapi
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -65,7 +66,7 @@ templates = Jinja2Templates(directory="templates")
 # Render Landing page
 @app.get('/')
 @limiter.limit("3/minute")
-def homepage(request: Request, username):
+def homepage(request: Request):
     return templates.TemplateResponse('index.html', {"request": request})
 
 
@@ -85,10 +86,7 @@ async def form_post(request: Request, _hash: str = Form(...)):
                                           Back to Home<b></a>''')})
     if isinstance(result, bytes):
         result = result.decode("utf-8")
-        result = Markup(f'<hr size="8"><br><b>{result}</b><br>'
-                        f' <a href="https://twitter.com/{json.loads(result)["user"]["screen_name"]}/status/'
-                        f'{json.loads(result)["id_str"]}"><b style="color: red; ">'
-                        f'View on Twitter<b></a><br><hr size="8">''')
+        result = Markup(f'{json.loads(result)["id_str"]}"')
     return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
 
 
@@ -98,14 +96,16 @@ async def form_post(request: Request, _hash: str = Form(...)):
 async def get(request: Request, _hash: str):
     if re.match(r'^[Qm][1-9A-Za-z]{44}[^OIl]$', _hash) is None:
         return templates.TemplateResponse('result.html',
-                                          context={'request': request, 'result': Markup(f'''<b>Bad Query</b>
-                                                  <br><a href="https://dcr-timestampbot.com"><b style="color: red; ">
-                                                  Back to Home<b></a>''')})
+                                          context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">Invalid query format. Make sure it starts with "Qm" and is 46 characters long.</pre>'
+                                          f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
     result = Ipfs(_hash).search()
     if isinstance(result, bytes):
         result = result.decode("utf-8")
-        result = Markup(f'<hr size="8"><br><b>{result}</b><br>'
-                        f' <a href="https://twitter.com/{json.loads(result)["user"]["screen_name"]}/status/'
-                        f'{json.loads(result)["id_str"]}"><b style="color: red; ">'
-                        f'View on Twitter<b></a><br><hr size="8">''')
+        result = Markup(f'<pre class="result__thread result__thread--success">{result}</pre>'
+                        f'<div class="result__twitter"><a target="__blank" href="https://twitter.com/{json.loads(result)["user"]["screen_name"]}/status/'
+                        f'{json.loads(result)["id_str"]}">'
+                        f'View on Twitter</a></div>''')
     return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
+
+if __name__ == "__main__":
+    uvicorn.run(app=app, host="127.0.0.1", port=3000)

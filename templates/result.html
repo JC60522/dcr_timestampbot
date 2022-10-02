@@ -2,92 +2,66 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
+        <meta name="viewport" content="width=device-width, initial-scale=1,
+        shrink-to-fit=no">
+        <meta name="description" content="Twitter timestamp bot powered by ipfs
+        and dcrtime" />
         <meta name="author" content="JC60522" />
-        <title>dcr-timestampbot</title>
-        <!-- Favicon-->
-        <!--<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />-->
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{{ url_for('static', path='/styles.css') }}" rel="stylesheet" />
-        <style>
-            body {
-              background-image: url("{{ url_for('static', path='/Decred2.jpg') }}");
-              background-repeat: no-repeat;
-              background-attachment: fixed;
-              background-position: center;
-              background-size: cover;
-              animation: fadeInAnimation ease 3s;
-              animation-iteration-count: 1;
-              animation-fill-mode: forwards;
-            }
-            @keyframes fadeInAnimation {
-                0% {
-                    opacity: 0;
-                }
-                100% {
-                    opacity: 1;
-                }
-            }
-            .buttonHolder{ text-align: center;
-                           margin-top: 20%;  }
-
-            .buttonHolder{ text-align: center;}
-
-            #main-doc {
-            position: absolute;
-            padding: 20px;
-            margin-bottom: 110px;
-            }
-
-            body {
-            min-width: 290px;
-            color: #000000;
-            background-color: #ffffff;
-            font-family: "Open Sans", Arial, sans-serif;
-            line-height: 1.5;
-}
-          </style>
+        <title>DCR Timestamp Bot</title>
+        <link rel="shortcut icon" type="images/x-icon" href="{{
+        url_for('static', path='/favicon.ico') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', path='/styles.css')
+        }}"/>
     </head>
     <body>
-        <!-- Responsive navbar-->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="https://dcr-timestampbot.com">dcr_timestamp_tweet</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link active" aria-current="page">About</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"></a>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <div class="buttonHolder2">
-                                    <li><a class="dropdown-item" href="https://docs.decred.org/advanced/dcrtime/">dcrtime</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" href="https://ipfs.io/">ipfs</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li><a class="dropdown-item" href="https://github.com/tiagoalvesdulce/dcrtimestamptweet">source code</a></li>
-                            </div>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+        <nav class="navbar">
+            <div>
+            <a class="navbar__brand link--gray"
+            href="https://dcr-timestampbot.com">DCRTweetStamp</a>
+            <ul class="navbar__dropdown">
+                <li class="navbar__dropdown__item"><a class="link--gray"
+                href="https://docs.decred.org/advanced/dcrtime/" target="_blank">Dcrtime</a></li>
+                <li class="navbar__dropdown__item"><a class="link--gray"
+                href="https://ipfs.io/" target="_blank">IPFS</a></li>
+                <li class="navbar__dropdown__item"><a class="link--gray"
+                href="https://github.com/JC60522/dcr_timestampbot" target="_blank">Github</a></li>
+            </ul>
+        </div>
         </nav>
-        <!-- Page content-->
-        <div class="container">
-            <div class="text-center mt-5">
-                <p class="lead">Query Engine</p>
-                <p>v0.0.1</p>
+        <section id="Setup" class="main-section">
+            <p class="main-section__header">
+                Timestamp tweets against the Decred blockchain using <a
+                href="https://docs.decred.org/advanced/dcrtime/">dcrtime</a> and <a
+                href="https://ipfs.io/">ipfs</a>! Just reply to the tweet you want
+                timestamped mentioning <a
+                href="https://twitter.com/dcrtimestampbot">@dcrtimestampbot</a>.
+            </p>
+            <div>
+            <h2>Result</h2>
+            <div class="result">
+                {{ result }}
             </div>
         </div>
-    <section id='Setup' class='main-section'>
-        <div class="buttonHolder">
-            <br>
-                <p>{{ result }}</p>
-            </div> 
-    </section>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <div>
+            <h2>How it works</h2>
+            <p>
+                Every time <a
+                href="https://twitter.com/dcrtimestampbot">@dcrtimestampbot</a> is
+                mentioned on twitter, a hash of the JSON-like string of the entire thread is timestamped and a file containing this string is stored on IPFS.
+            </p>
+            <p>
+                Saving the IPFS hash you can get the thread digest and verify if it has been timestamped. This is a timestamp proof!
+            </p>
+        </div>
+        </section>
+        <footer class="footer">
+            <div>
+            <div class="footer__donation">
+                <span class="footer__donation__text">If you find this site valuable, buy me a coffee.</span>
+                <span class="footer__donation__text">DCR: DCR_ADDRESS</span>
+            </div>
+            <span class="footer__text">© 2022 Copyright JC60522</span>
+        </div>
+        </footer>
     </body>
 </html>
