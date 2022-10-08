@@ -1,9 +1,5 @@
-import json, secrets, re
-import uvicorn
-from fastapi.openapi.docs import get_swagger_ui_html
-from fastapi.openapi.utils import get_openapi
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
+import json, re
+from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,48 +10,18 @@ from ipfs_interface import Ipfs
 from markupsafe import Markup
 
 
-limiter = Limiter(key_func=get_remote_address)
-security = HTTPBasic()
-
-
 app = FastAPI(
-    title="dcr-timestampbot",
-    description="dcr-timestampbot",
-    version="0.0.1",
+    redoc_url=None,
     docs_url=None,
     openapi_url=None)
 
+limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(
     CORSMiddleware,
     allow_methods=["GET", "POST"],
 )
-
-
-# Basic auth wall to access swagger docs
-def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, "######")
-    correct_password = secrets.compare_digest(credentials.password, "######")
-    if not (correct_username and correct_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
-
-
-@app.get("/docs", include_in_schema=False)
-async def get_swagger_documentation(username: bool = Depends(get_current_username)):
-    if username:
-        return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
-
-
-@app.get("/openapi.json", include_in_schema=False)
-async def openapi(username: bool = Depends(get_current_username)):
-    if username:
-        return get_openapi(title=app.title, version=app.version, routes=app.routes)
 
 
 # template and static files pointer
@@ -86,7 +52,7 @@ async def form_post(request: Request, _hash: str = Form(...)):
                                           Back to Home<b></a>''')})
     if isinstance(result, bytes):
         result = result.decode("utf-8")
-        result = Markup(f'{json.loads(result)["id_str"]}"')
+        result = Markup(f'{json.loads(result)}"')
     return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
 
 
@@ -106,6 +72,3 @@ async def get(request: Request, _hash: str):
                         f'{json.loads(result)["id_str"]}">'
                         f'View on Twitter</a></div>''')
     return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
-
-if __name__ == "__main__":
-    uvicorn.run(app=app, host="127.0.0.1", port=3000)
