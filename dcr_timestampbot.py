@@ -1,12 +1,17 @@
 from hashlib import sha256
 import json, requests
 import tweepy
-from apscheduler.schedulers.blocking import BlockingScheduler
+import time
 from ipfs_interface import Ipfs
+from getpass import getpass
 
+api_key_secret = getpass("Enter your api_key_secret:\n")
+bearer_token = getpass("Enter your bearer_token:\n")
+access_token = getpass("Enter your access_token:\n")
+access_secret = getpass("Enter your access_secret:\n")
 
-auth = tweepy.OAuthHandler('##############', '#########################')
-auth.set_access_token('##################-##################', '############################')
+auth = tweepy.OAuthHandler(api_key_secret, bearer_token)
+auth.set_access_token(access_token, access_secret)
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
 
@@ -60,7 +65,7 @@ def listen():
                     print('Error adding content to ipfs.')
 
                 # Construct tweet body
-                ipfs_url = f'https://dcr-timestampbot.com/ipfs/{cid}'
+                ipfs_url = f'https://dcr-timestampbot.com/ipfs/{cid.decode("utf-8")}'
                 reply = f'Hey There @{template["user"]["screen_name"]} :) This thread is stored on IPFS and will be timestamped within the next hour. Times-tamping status: {dcrtime_url} ~ IPFS Thread: {ipfs_url}'
                 try:
                     # Tweet reply to mention with ipfs and dcr-time urls, and save ID to csv (last mentioned)
@@ -77,11 +82,11 @@ def listen():
 
 def scheduler():
     """
-    Method creates cron-like job to check twitter mentions every once every 55 seconds.
+    Method checks twitter mentions every once every 55 seconds.
     """
-    sched = BlockingScheduler()
-    sched.add_job(listen, 'interval', seconds=55)
-    sched.start()
+    while True:
+        time.sleep(55)
+        listen()
 
 
 if __name__ == '__main__':
