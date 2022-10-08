@@ -1,4 +1,4 @@
-import ipfshttpclient
+import json, subprocess, uuid
 
 
 class Ipfs:
@@ -11,8 +11,7 @@ class Ipfs:
         :return: Returns search result.
         """
         try:
-            client = ipfshttpclient.connect(timeout=5)
-            res = client.cat(self.query)
+            res = subprocess.check_output(["ipfs", "cat", self.query], timeout=5)
             return res
         except Exception as e:
             print(e)
@@ -24,10 +23,12 @@ class Ipfs:
         :return: Returns CIDv0.
         """
         try:
-            client = ipfshttpclient.connect(timeout=5)
-            res = client.add_json(self.query)
+            serialized_query = json.dumps(self.query)
+            unique_id = str(uuid.uuid4())
+            with open(f"./temp/{unique_id}.json", "w") as f:
+                f.write(serialized_query)
+            res = subprocess.check_output(["ipfs", "add", f"./temp/{unique_id}.json"], timeout=5).split()[1]
             return res
         except Exception as e:
             print(e)
             return False
-
