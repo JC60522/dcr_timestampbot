@@ -1,5 +1,5 @@
 import json, re
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,6 +33,8 @@ templates = Jinja2Templates(directory="templates")
 @app.get('/')
 @limiter.limit("3/minute")
 def homepage(request: Request):
+    if str(request.query_params):
+        raise HTTPException(status_code=401, detail="URL Query Params not allowed here.")
     return templates.TemplateResponse('index.html', {"request": request})
 
 
@@ -42,18 +44,14 @@ def homepage(request: Request):
 async def form_post(request: Request, _hash: str = Form(...)):
     if re.match(r'^[Qm][1-9A-Za-z]{44}[^OIl]$', _hash) is None:
         return templates.TemplateResponse('result.html',
-                                          context={'request': request, 'result': Markup(f'''<b>Bad Query</b>
-                                          <br><a href="https://dcr-timestampbot.com"><b style="color: red; ">
-                                          Back to Home<b></a>''')})
+                                          context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">Invalid query format. Make sure it starts with "Qm" and is 46 characters long.</pre>'
+                                          f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
     result = Ipfs(_hash).search()
     if not result:
-        return templates.TemplateResponse('result.html', context={'request': request, 'result': Markup(f'''<b>CID Not Found</b>
-                                          <br><a href="https://dcr-timestampbot.com"><b style="color: red; ">
-                                          Back to Home<b></a>''')})
+        return templates.TemplateResponse('result.html', context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">CID Not Found.</pre>'
+                                          f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
     if isinstance(result, bytes):
-        result = result.decode("utf-8")
-        result = Markup(f'{json.loads(result)}"')
-    return templates.TemplateResponse('result.html', context={'request': request, 'result': result})
+        return templates.TemplateResponse('result.html', context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--success">{json.loads(result.decode("utf-8"))}</pre>')})
 
 
 # Route for ipfs-url in tweets
@@ -65,6 +63,10 @@ async def get(request: Request, _hash: str):
                                           context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">Invalid query format. Make sure it starts with "Qm" and is 46 characters long.</pre>'
                                           f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
     result = Ipfs(_hash).search()
+    if not result:
+        return templates.TemplateResponse('result.html', context={'request': request, 'result': Markup(f'<pre class="result__thread result__thread--fail">CID Not Found.</pre>'
+                                          f'<a href="https://dcr-timestampbot.com">Back Home</a>')})
+
     if isinstance(result, bytes):
         result = result.decode("utf-8")
         result = Markup(f'<pre class="result__thread result__thread--success">{result}</pre>'
