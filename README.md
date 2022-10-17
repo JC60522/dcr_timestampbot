@@ -1,10 +1,19 @@
-This is v0.0.1 of dcr-timestampbot. This project is inspired by friendly enquiry of https://github.com/tiagoalvesdulce/dcrtimestamptweet.
+This is v0.1.0 of dcr-timestampbot. This project is inspired by friendly enquiry of https://github.com/tiagoalvesdulce/dcrtimestamptweet.
 
 The request was to fix some issues as well giving me the opportunity to rebuild & maintain this twitter bot in a language I feel comfortable with. 
-My current language of choice is Python.
+For this particular application my current language of choice is Python.
 
-This README as well as the codebase will most likely see some updates in the near future as the bot needs to go through some testing etc. before activation.
+How it works
 
-The bot will have an accompanying bare bones front-end where timestamped - ipfs logged tweets can be viewed at: https://dcr-timestampbot.com 
-The idea of this is to host an IPFS node specifically dedicated to the timestamped tweets for easy retrieval - linked to the front end. The ipfs url in the tweets
-will land on the user on this front-end displaying the query result. 
+Every time @dcrtimestampbot is mentioned on twitter, a hash of the JSON-like string of the entire thread is timestamped and a file containing this string is stored on IPFS.
+
+Saving the IPFS hash you can get the thread digest and verify if it has been timestamped on the Decred Blockchain.
+
+In order to run this codebase:
+
+-Setup/run IPFS node/daemon
+-Run main.py
+-Run dcr_timestampbot.py ~  When prompted enter your API-Keys.
+-Optional ~ Host another node and run a routine job that pins the content from the main node to secondary. / Push to service like Web3Storage.
+
+**Make sure the "id_str" of the user who last mentioned the bot is saved in last_mentioned.csv
