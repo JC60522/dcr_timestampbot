@@ -5,9 +5,9 @@ For this particular application my current language of choice is Python.
 
 How it works
 
-Every time @dcrtimestampbot is mentioned on twitter, a hash of the JSON-like string of the entire thread is timestamped and a file containing this string is stored on IPFS.
+Every time @dcrtimestampbot is mentioned on twitter, a hash of the JSON-like string of the tweet is timestamped and a file containing this string is stored on IPFS.
 
-Saving the IPFS hash you can get the thread digest and verify if it has been timestamped on the Decred Blockchain.
+Saving the IPFS hash you can get the tweet digest and verify if it has been timestamped on the Decred Blockchain.
 
 In order to run this codebase:
 
